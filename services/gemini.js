@@ -1,16 +1,22 @@
-// Gemini service — falls back to mock if GEMINI_API_KEY not set
+// Gemini service — falls back to mock if GEMINI_API_KEY not set or SDK missing
 let genAI = null;
-const hasKey = !!process.env.GEMINI_API_KEY;
+const keyPresent = !!process.env.GEMINI_API_KEY;
 
-if (hasKey) {
+if (keyPresent) {
   try {
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    console.log('[gemini] SDK loaded — LIVE mode');
   } catch (e) {
-    console.warn('[gemini] @google/generative-ai not installed — running mock');
+    console.warn('[gemini] @google/generative-ai not installed — running MOCK. Run `npm install @google/generative-ai`');
     genAI = null;
   }
+} else {
+  console.log('[gemini] No GEMINI_API_KEY — running MOCK');
 }
+
+// Reflects actual capability, not just env var presence
+const hasKey = !!genAI;
 
 const MOCK_FOODS = [
   { food_name_bn: 'সাদা ভাত', food_name_en: 'White Rice', estimated_quantity_g: 150, confidence: 'high', is_cooked: true, category: 'rice' },
