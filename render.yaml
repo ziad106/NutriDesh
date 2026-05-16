@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nutridesh-api
+    runtime: node
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /ping
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: GEMINI_API_KEY
+        sync: false

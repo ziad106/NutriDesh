@@ -1,0 +1,21 @@
+// Minimal BD food DB for backend search endpoint
+module.exports = [
+  { id: 'f001', name_bn: 'সাদা ভাত', name_en: 'White Rice', category: 'rice', calories: 130, protein: 2.7, carbs: 28, fat: 0.3, iron: 0.2, calcium: 10, gi: 73 },
+  { id: 'f002', name_bn: 'লাল চালের ভাত', name_en: 'Brown Rice', category: 'rice', calories: 111, protein: 2.6, carbs: 23, fat: 0.9, iron: 0.4, calcium: 10, gi: 55 },
+  { id: 'f003', name_bn: 'রুটি', name_en: 'Roti', category: 'rice', calories: 297, protein: 11, carbs: 56, fat: 4, iron: 3, calcium: 31, gi: 62 },
+  { id: 'f010', name_bn: 'মসুর ডাল', name_en: 'Masoor Dal', category: 'dal', calories: 116, protein: 9, carbs: 20, fat: 0.4, iron: 3.3, calcium: 19, gi: 32 },
+  { id: 'f011', name_bn: 'মুগ ডাল', name_en: 'Moong Dal', category: 'dal', calories: 105, protein: 7, carbs: 19, fat: 0.4, iron: 1.4, calcium: 27, gi: 31 },
+  { id: 'f020', name_bn: 'ইলিশ মাছ', name_en: 'Hilsa', category: 'fish', calories: 273, protein: 21, carbs: 0, fat: 19, iron: 2.1, calcium: 180, gi: 0 },
+  { id: 'f021', name_bn: 'রুই মাছ', name_en: 'Rui', category: 'fish', calories: 97, protein: 16, carbs: 0, fat: 1.4, iron: 1, calcium: 100, gi: 0 },
+  { id: 'f030', name_bn: 'মুরগির মাংস', name_en: 'Chicken', category: 'meat', calories: 165, protein: 31, carbs: 0, fat: 3.6, iron: 1, calcium: 15, gi: 0 },
+  { id: 'f032', name_bn: 'ডিম', name_en: 'Egg', category: 'meat', calories: 155, protein: 13, carbs: 1.1, fat: 11, iron: 1.2, calcium: 50, gi: 0 },
+  { id: 'f040', name_bn: 'পুঁই শাক', name_en: 'Pui Shak', category: 'vegetable', calories: 19, protein: 1.8, carbs: 3.4, fat: 0.3, iron: 1.2, calcium: 109, gi: 15 },
+  { id: 'f041', name_bn: 'লাল শাক', name_en: 'Lal Shak', category: 'vegetable', calories: 23, protein: 2.5, carbs: 4, fat: 0.3, iron: 2.3, calcium: 215, gi: 15 },
+  { id: 'f044', name_bn: 'করলা', name_en: 'Karola', category: 'vegetable', calories: 17, protein: 1, carbs: 3.7, fat: 0.2, iron: 0.4, calcium: 19, gi: 22 },
+  { id: 'f060', name_bn: 'কলা', name_en: 'Banana', category: 'fruit', calories: 89, protein: 1.1, carbs: 23, fat: 0.3, iron: 0.3, calcium: 5, gi: 51 },
+  { id: 'f061', name_bn: 'আম', name_en: 'Mango', category: 'fruit', calories: 60, protein: 0.8, carbs: 15, fat: 0.4, iron: 0.2, calcium: 11, gi: 51 },
+  { id: 'f063', name_bn: 'পেয়ারা', name_en: 'Guava', category: 'fruit', calories: 68, protein: 2.6, carbs: 14, fat: 1, iron: 0.3, calcium: 18, gi: 24 },
+  { id: 'f080', name_bn: 'দুধ', name_en: 'Milk', category: 'dairy', calories: 60, protein: 3.2, carbs: 4.8, fat: 3.3, iron: 0.03, calcium: 113, gi: 31 },
+  { id: 'f081', name_bn: 'দই', name_en: 'Yogurt', category: 'dairy', calories: 61, protein: 3.5, carbs: 4.7, fat: 3.3, iron: 0.05, calcium: 121, gi: 35 },
+  { id: 'f090', name_bn: 'বিরিয়ানি', name_en: 'Biriyani', category: 'rice', calories: 280, protein: 12, carbs: 35, fat: 10, iron: 1.8, calcium: 35, gi: 70 },
+];
