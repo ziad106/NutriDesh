@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "NutriDesh",
+    "slug": "nutridesh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "nutridesh",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#F8F5EF"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nutridesh.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "NutriDesh khabarer chobi tulte camera-r anumoti chay.",
+        "NSMicrophoneUsageDescription": "Voice input-er jonno microphone-er anumoti chay."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F8F5EF"
+      },
+      "package": "com.nutridesh.app",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow NutriDesh to access your camera to scan food."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fcc9f191-3666-417a-9b4d-e5329832c184"
+      }
+    },
+    "owner": "nutridesh-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/fcc9f191-3666-417a-9b4d-e5329832c184"
+    }
+  }
+}

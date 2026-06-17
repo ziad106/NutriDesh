@@ -1,82 +1,128 @@
-# NutriDesh Backend
+# NutriDesh 🌿
 
-Express + Gemini AI nutrition API for the [NutriDesh](https://github.com/) mobile app — Bangladesh-focused nutrition tracker.
+**আপনার পরিবারের পুষ্টি সঙ্গী — Your Family's Nutrition Companion**
 
-## Features
+Bangladesh-focused nutrition tracker with AI food scanning, Bangla chat assistant, diabetes/pregnancy modes, and budget meal planning.
 
-- POST `/api/scan/food` — image → identified BD foods (Gemini Flash vision)
-- POST `/api/chat` — Bangla nutrition assistant with profile context
-- POST `/api/recommendations` — meal suggestions with budget constraint
-- GET `/api/foods` — search 18+ pre-seeded BD foods
-- Auto-fallback to deterministic mock responses when no API key
-- Rate-limited (10 req/min on AI endpoints)
-- In-memory response cache (30-day TTL)
+## What's inside
 
-## Stack
+- **`nutridesh-app/`** — Expo React Native mobile app (iOS + Android + Web)
+- **`nutridesh-backend/`** — Express API with Gemini AI integration
 
-- Node 20+
-- Express 4
-- `@google/generative-ai` (Gemini Flash latest)
-- Helmet + CORS + compression + rate-limit
+Both ship with **mock data and mock AI** so the app runs end-to-end without any API keys. Add `GEMINI_API_KEY` to enable real Gemini scanning.
 
-## Setup
+---
+
+## Quick start
+
+### 1. Mobile app
 
 ```bash
-git clone https://github.com/YOUR_USER/NutriDesh.git
-cd NutriDesh
+cd nutridesh-app
 npm install
-cp .env.example .env
-# edit .env — add your GEMINI_API_KEY
+npx expo start
+```
+
+Then scan the QR code with **Expo Go** app (iOS App Store / Google Play) on your phone, OR press:
+- `i` — open in iOS simulator
+- `a` — open in Android emulator
+- `w` — open in web browser
+
+### 2. Backend (optional — app works without it)
+
+```bash
+cd nutridesh-backend
+npm install
 npm start
 ```
 
-Server runs on `http://localhost:3000` by default. Override with `PORT=3737 npm start`.
+API runs on `http://localhost:3000`. Health check: `GET /` and `GET /ping`.
 
-## Environment
+### 3. Enable real AI (optional)
 
-| Var | Required | Description |
-|---|---|---|
-| `GEMINI_API_KEY` | No (falls back to mock) | Get free at https://aistudio.google.com/apikey |
-| `PORT` | No | Default 3000 |
-| `ALLOWED_ORIGINS` | No | CORS allowed origins, `*` for any |
-| `NODE_ENV` | No | `development` or `production` |
+1. Get free Gemini API key from https://aistudio.google.com (no credit card)
+2. `cd nutridesh-backend && echo "GEMINI_API_KEY=your_key_here" >> .env`
+3. `npm install @google/generative-ai` (already listed as optional dep)
+4. Restart server. `GET /` will report `"gemini": "live"`.
 
-## Deploy to Render (free tier)
+---
 
-1. Fork this repo
-2. https://render.com → New Web Service → connect repo
-3. Build: `npm install` | Start: `node server.js`
-4. Add env var: `GEMINI_API_KEY`
-5. Deploy. Keep alive with cron-job.org → `/ping` every 14 min.
+## Features
 
-See `render.yaml` for auto-config.
+### Home
+- Daily nutrition ring (calories remaining, animated)
+- Macro pills (protein / carbs / fat with progress bars)
+- Micronutrient chips (iron, calcium, vitamin A, folate)
+- AI insight card (dynamic based on deficiencies)
+- Deficiency alert (iron, calcium thresholds)
+- Today's meals timeline
+- Quick actions: scan / chat / budget / cook
+- Seasonal food carousel
+- Streak counter
 
-## API quick reference
+### Scanner
+- Live camera preview (Expo Camera)
+- Gallery import + voice fallback
+- Meal-type selector (breakfast/lunch/dinner/snack)
+- Animated cooking-pot loader during scan
+- Multi-item result with confidence badges
+- Portion sliders + presets (80g / 150g / 250g)
+- GI traffic light for diabetics
+- Manual food search (50+ Bangladeshi foods)
 
-```bash
-# Health
-curl http://localhost:3000/ping
+### Chat
+- Bangla AI assistant (পুষ্টি সহায়ক)
+- Quick-reply chips (diabetes, protein, budget, ramadan, child)
+- Typing dots animation
+- Bangla TTS (tap 🔊 to hear response)
+- Rule-based mock; swap to Gemini with one env var
 
-# Chat
-curl -X POST http://localhost:3000/api/chat \
-  -H 'Content-Type: application/json' \
-  -d '{"message":"আজ কী খাব?","profile":{"name":"Test","conditions":["diabetes"]}}'
+### Profile & modes
+- Editable health profile (auto-recalculates calorie/macro/micro targets)
+- Family members CRUD
+- Child profile with WHO stunting/underweight assessment
+- Diabetes mode (glucose log, GI summary, sodium alert, doctor PDF)
+- Pregnancy mode (trimester targets, recommended/avoid foods)
+- Ramadan mode (sehri/iftar plans, hydration tracker)
+- Shastho Shebika portal (PIN-locked, family list, PDF reports)
+- Settings (language toggle, dark mode, notifications)
+- Privacy & consent screen
 
-# Food scan (base64 image)
-curl -X POST http://localhost:3000/api/scan/food \
-  -H 'Content-Type: application/json' \
-  -d '{"imageBase64":"...","mimeType":"image/jpeg"}'
+### Other
+- Weekly report (7-day averages → PDF export via expo-print)
+- Budget meal planner (৳50–৳300, bazaar price table)
+- "What can I cook?" with ingredient picker + recipe gen
+- Mood / energy logger
 
-# Recommendations
-curl -X POST http://localhost:3000/api/recommendations \
-  -H 'Content-Type: application/json' \
-  -d '{"profile":{"conditions":["diabetes"]},"budget":150}'
+---
+
+## Architecture
+
 ```
+Frontend (Expo SDK 51)
+├── Redux Toolkit (auth, profile, mealLog, chat, ui)
+├── React Navigation 6 (Stack + Bottom Tabs)
+├── React Native Paper (Material 3 theme)
+├── React Native Reanimated 2 (ring, dots, splash, loader)
+└── AsyncStorage (offline persistence — wired but not auto-rehydrating)
+
+Backend (Node 20 + Express)
+├── Helmet + compression + morgan
+├── express-rate-limit (10 req/min on AI routes)
+├── In-memory cache (TTL 30 days, for scan/chat)
+└── Gemini service (auto-mock if no API key)
+```
+
+---
+
+## Database schema (Supabase)
+
+When ready to enable cloud sync, run the SQL from the original spec (`NUTRIDESH_MASTER_PROMPT.md` section 4). RLS policies are included.
+
+---
 
 ## Disclaimer
 
-NutriDesh is a nutrition tracking and education tool, **not a medical device**. Consult a registered dietician or physician for medical decisions.
+NutriDesh is a tracking and education tool, **not a medical device**. Consult a registered dietician or physician for medical decisions.
 
-## License
-
-MIT
+Built for Bangladesh. Powered by AI. Costs nothing.
