@@ -1508,7 +1508,7 @@ git add . && git commit -m "NutriDesh backend" && git push origin main
 
 # 3. Set up keep-alive ping:
 #    Go to cron-job.org (free)
-#    Create job: GET https://your-render-url.onrender.com/ping
+#    Create job: GET https://nutridesh.onrender.com/ping
 #    Schedule: Every 14 minutes
 #    This prevents Render free tier from spinning down
 ```

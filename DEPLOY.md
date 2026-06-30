@@ -34,18 +34,19 @@ git push -u origin main
    - `NODE_ENV` = `production`
 5. Create
 
-Wait 3-5 min. URL: `https://nutridesh-api.onrender.com`. Verify by opening URL.
+Wait 3-5 min. URL: `https://nutridesh.onrender.com`. Verify by opening URL.
 
 ### A4. Keep alive (free tier sleeps after 15 min idle)
 
-https://cron-job.org → GET `https://nutridesh-api.onrender.com/ping` every 14 min.
+**UptimeRobot (free, alerts you when down):** https://uptimerobot.com → Add New Monitor → HTTP(s) → URL `https://nutridesh.onrender.com/ping` → interval **5 min**.
+(Alt: https://cron-job.org → GET `https://nutridesh.onrender.com/ping` every 14 min, no alerts.)
 
 ### A5. Update app .env
 
 ```bash
 cd ../nutridesh-app
 # Edit .env:
-# EXPO_PUBLIC_API_URL=https://nutridesh-api.onrender.com
+# EXPO_PUBLIC_API_URL=https://nutridesh.onrender.com
 ```
 
 ### A6. Publish to Expo
