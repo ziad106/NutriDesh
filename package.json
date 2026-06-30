@@ -1,0 +1,16 @@
+{
+  "name": "nutridesh-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NutriDesh monorepo — root entry delegates to nutridesh-backend so Render builds from repo root.",
+  "workspaces": [
+    "nutridesh-backend"
+  ],
+  "scripts": {
+    "start": "node server.js",
+    "build": "npm install"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
