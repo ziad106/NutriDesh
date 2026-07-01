@@ -3,12 +3,12 @@ const router = express.Router();
 const gemini = require('../services/gemini');
 
 router.post('/', async (req, res) => {
-  const { message, profile = {}, todayLog = {}, history = [] } = req.body || {};
+  const { message, profile = {}, todayLog = {}, history = [], language = 'auto' } = req.body || {};
   const clean = (message || '').toString().trim().slice(0, 1000);
   if (!clean) return res.status(400).json({ error: 'message required' });
 
   try {
-    const reply = await gemini.chat(clean, profile, todayLog, history);
+    const reply = await gemini.chat(clean, profile, todayLog, history, language);
     res.json({ response: reply, timestamp: new Date().toISOString() });
   } catch (err) {
     console.error('[chat]', err);

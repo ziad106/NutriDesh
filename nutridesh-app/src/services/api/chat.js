@@ -2,9 +2,9 @@
 import { postJSON } from './client';
 import { mockChat } from '../mockAI';
 
-export async function chat(message, profile, todayLog, history) {
+export async function chat(message, profile, todayLog, history, language = 'auto') {
   try {
-    const data = await postJSON('/api/chat', { message, profile, todayLog, history });
+    const data = await postJSON('/api/chat', { message, profile, todayLog, history, language });
     return data.response;
   } catch (err) {
     console.warn('[api.chat] fallback to mock:', err.message);

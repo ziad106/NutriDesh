@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import * as Speech from 'expo-speech';
 import { COLORS } from '../../constants/colors';
 import { STRINGS } from '../../constants/strings';
 import { addMessage, setTyping } from '../../store/slices/chatSlice';
+import { setChatLang } from '../../store/slices/uiSlice';
 import { chat as apiChat } from '../../services/api';
 
 const QUICK_REPLIES = [
@@ -25,6 +26,35 @@ const QUICK_REPLIES = [
   STRINGS.QUICK_REPLY_4,
   STRINGS.QUICK_REPLY_5,
 ];
+
+// Chat reply-language cycle: Auto -> Bangla -> Banglish -> English
+const LANG_CYCLE = ['auto', 'bn', 'banglish', 'en'];
+const LANG_LABELS = { auto: 'Auto', bn: 'বাংলা', banglish: 'Banglish', en: 'English' };
+
+// Proactive opener tailored to the user's remaining calories + condition.
+function buildOpener(profile = {}, todayLog = {}, lang = 'auto') {
+  const name = profile.name || '';
+  const target = profile.calorie_target || 1800;
+  const remaining = Math.max(0, target - (todayLog.calories || 0));
+  const cond = profile.conditions?.[0];
+  const l = lang === 'auto' ? 'bn' : lang;
+  if (l === 'en') {
+    let s = `Hi${name ? ' ' + name : ''}! You have ${remaining} kcal left today.`;
+    if (cond) s += ` Keeping your ${cond} in mind, want a suggestion for your next meal?`;
+    else s += ' Want a suggestion for your next meal?';
+    return s;
+  }
+  if (l === 'banglish') {
+    let s = `${name ? name + ' bhai, ' : ''}aaj apnar ${remaining} kcal baki ache.`;
+    if (cond) s += ` Apnar ${cond} mathay rekhe porer belar jonno kichu suggest kori?`;
+    else s += ' Porer belar jonno kichu suggest kori?';
+    return s;
+  }
+  let s = `${name ? name + ' ভাই, ' : ''}আজ আপনার ${remaining} kcal বাকি আছে।`;
+  if (cond) s += ` আপনার ${cond} মাথায় রেখে পরের বেলার জন্য কিছু সাজেস্ট করি?`;
+  else s += ' পরের বেলার জন্য কিছু সাজেস্ট করি?';
+  return s;
+}
 
 function TypingDots() {
   const dot1 = useSharedValue(0);
@@ -52,8 +82,38 @@ export default function ChatScreen() {
   const messages = useSelector((s) => s.chat.messages);
   const isTyping = useSelector((s) => s.chat.isTyping);
   const profile = useSelector((s) => s.profile.profile);
+  const meals = useSelector((s) => s.mealLog?.meals || []);
+  const chatLang = useSelector((s) => s.ui?.chatLang || 'auto');
   const [text, setText] = useState('');
   const scrollRef = useRef(null);
+
+  // Today's intake, used to make the assistant proactive.
+  const todayLog = useMemo(() => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const calories = meals
+      .filter((m) => (m.logged_at || 0) >= start.getTime())
+      .reduce((sum, m) => sum + (m.calories || 0), 0);
+    return { calories: Math.round(calories) };
+  }, [meals]);
+
+  // Proactive opener on first open (only when the default greeting is alone).
+  useEffect(() => {
+    if (messages.length === 1 && messages[0]?._id === 'init') {
+      dispatch(addMessage({
+        _id: 'opener',
+        text: buildOpener(profile, todayLog, chatLang),
+        createdAt: new Date(),
+        user: { _id: 2, name: STRINGS.ASSISTANT_NAME },
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function cycleLang() {
+    const next = LANG_CYCLE[(LANG_CYCLE.indexOf(chatLang) + 1) % LANG_CYCLE.length];
+    dispatch(setChatLang(next));
+  }
 
   async function send(content) {
     const msg = (content || text).trim();
@@ -61,14 +121,28 @@ export default function ChatScreen() {
     setText('');
     dispatch(addMessage({ _id: 'u' + Date.now(), text: msg, createdAt: new Date(), user: { _id: 1 } }));
     dispatch(setTyping(true));
-    const reply = await apiChat(msg, profile, {}, messages.slice(0, 10).map(m => ({ role: m.user?._id === 1 ? 'user' : 'model', content: m.text })));
+    let reply;
+    try {
+      reply = await apiChat(
+        msg,
+        profile,
+        todayLog,
+        messages.slice(0, 10).map((m) => ({ role: m.user?._id === 1 ? 'user' : 'model', content: m.text })),
+        chatLang,
+      );
+    } catch (e) {
+      reply = chatLang === 'en'
+        ? 'Sorry, I could not reply just now. Please try again.'
+        : 'দুঃখিত, এখন উত্তর দেওয়া যায়নি। আবার চেষ্টা করুন।';
+    }
     dispatch(setTyping(false));
     dispatch(addMessage({ _id: 'a' + Date.now(), text: reply, createdAt: new Date(), user: { _id: 2, name: STRINGS.ASSISTANT_NAME } }));
   }
 
   function speak(t) {
     Speech.stop();
-    Speech.speak(t, { language: 'bn-BD', rate: 0.95 });
+    const isBangla = /[ঀ-৿]/.test(t);
+    Speech.speak(t, { language: isBangla ? 'bn-BD' : 'en-US', rate: 0.95 });
   }
 
   return (
@@ -82,6 +156,10 @@ export default function ChatScreen() {
             <Text style={styles.statusText}>অনলাইন</Text>
           </View>
         </View>
+        <TouchableOpacity style={styles.langChip} onPress={cycleLang}>
+          <Text style={styles.langIcon}>🌐</Text>
+          <Text style={styles.langText}>{LANG_LABELS[chatLang]}</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -152,6 +230,9 @@ const styles = StyleSheet.create({
   statusRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
   dotOnline: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.forestGreen, marginRight: 6 },
   statusText: { fontSize: 12, color: COLORS.textSecondary },
+  langChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: COLORS.forestGreen, backgroundColor: COLORS.cardSurface },
+  langIcon: { fontSize: 13, marginRight: 4 },
+  langText: { fontSize: 12, color: COLORS.forestGreen, fontWeight: '700' },
   scroll: { flex: 1 },
   bubbleRow: { marginVertical: 4, flexDirection: 'row' },
   userRow: { justifyContent: 'flex-end' },

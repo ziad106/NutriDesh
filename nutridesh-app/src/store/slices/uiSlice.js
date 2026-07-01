@@ -5,6 +5,7 @@ const initialState = {
   themeMode: 'light',
   rateLimitCountdown: 0,
   toastMessage: null,
+  chatLang: 'auto', // 'auto' | 'bn' | 'banglish' | 'en' — controls chat reply language
 };
 
 const uiSlice = createSlice({
@@ -15,8 +16,9 @@ const uiSlice = createSlice({
     setThemeMode(state, action) { state.themeMode = action.payload; },
     setRateLimit(state, action) { state.rateLimitCountdown = action.payload; },
     setToast(state, action) { state.toastMessage = action.payload; },
+    setChatLang(state, action) { state.chatLang = action.payload; },
   },
 });
 
-export const { setOffline, setThemeMode, setRateLimit, setToast } = uiSlice.actions;
+export const { setOffline, setThemeMode, setRateLimit, setToast, setChatLang } = uiSlice.actions;
 export default uiSlice.reducer;
